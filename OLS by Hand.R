@@ -5,7 +5,7 @@
 library(tidyverse)
 
 # Make some data
-set.seed(1000)
+set.seed(123)
 
 #Make our predictor variables and dependent variable 
 N = 100 # number of observations 
@@ -24,7 +24,7 @@ dfXy = data.frame(X, y)
 # y = dependent variable 
 
 lm_ls <- function(par, X, y){
-# Coeffiecents: 
+# Coefficients: 
 beta = par 
 
 # Linear Predictor:
@@ -52,4 +52,5 @@ fit_LS = optim(
   control = list(reltol = 1e-8)
 )
 
-fit_lm = lm(y ~ ., dfXy)
+# When you open the fit_LS object, you will see a set of values for the parameter function, 
+# these values will correspond to the beta coefficients in the lm function
