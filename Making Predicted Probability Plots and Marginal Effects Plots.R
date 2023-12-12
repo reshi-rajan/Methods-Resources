@@ -56,8 +56,8 @@ library(tidyverse)
 pred_prob <- avg_predictions(model)
 # Note: avg_predictions makes a prediction for for each group, it is assuming 
 # x is the variable of interest (which for us it is, we can specify a variable
-# by including it in the command such as (avg_predictions(model, variable = 'z))
-# ). If we want the predicted probability for each observation we use the 
+# by including it in the command such as (avg_predictions(model, variable = 'z)).
+# If we want the predicted probability for each observation we use the 
 # predictions(model) command instead. 
 
 ggplot(data = pred_prob, mapping = aes(y = estimate, x =group )) + 
