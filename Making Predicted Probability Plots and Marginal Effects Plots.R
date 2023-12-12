@@ -49,19 +49,26 @@ library(MASS)
 model <- polr(as.factor(y) ~ x + z, method = "logistic")
 summary(model)
 
-# Time for some Predicted Probability Plots! 
+## Time for some Predicted Probability Plots! 
 library(marginaleffects)
 library(tidyverse)
 
 pred_prob <- avg_predictions(model)
+# Note: avg_predictions makes a prediction for for each group, it is assuming 
+# x is the variable of interest (which for us it is, we can specify a variable
+# by including it in the command such as (avg_predictions(model, variable = 'z))
+# ). If we want the predicted probability for each observation we use the 
+# predictions(model) command instead. 
 
 ggplot(data = pred_prob, mapping = aes(y = estimate, x =group )) + 
   geom_point() + 
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) + 
   xlab("Level of Ordinal Variable") +
-  ylab("Avg. P(Observing our Y-variable)")
+  ylab("Avg. P(Observing our Y-variable)") +
+  ylim(0,1) + 
+  theme_bw()
   
-# Let's make some Marginal Effects Plots! 
+## Let's make some Marginal Effects Plots! 
 marg_fx <- avg_slopes(model)
 
 # Now let's look at the marginal effect of just x on y
@@ -69,14 +76,29 @@ marg_fx |>
   filter(term == 'x') |>
   ggplot(mapping = aes(y = estimate, x = group)) +
   geom_point() + 
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high))
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) + 
+  labs(x="Levels of Ordinal Variable", y="Marginal Effect of X on Y") +
+  theme_bw()
 
 # Now let's look at z's effect on y 
 marg_fx |>
   filter(term == 'z') |>
   ggplot(mapping = aes(y = estimate, x = group)) +
   geom_point() + 
-  geom_errorbar(aes(ymin = conf.low, ymax = conf.high))
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) + 
+  labs(x="Levels of Ordinal Variable", y="Marginal Effect of Z on Y") +
+  theme_bw()
+
+# What about comparing their effects on the same plot? 
+marg_fx |>
+  ggplot(mapping = aes(y = estimate, x = group, color = as.factor(term))) +
+  geom_point() + 
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high)) + 
+  labs(x="Levels of Ordinal Variable", y="Marginal Effect of X and Z on Y") +
+  scale_color_manual(labels = c("x", "z"), values = c("blue", "red")) +
+  theme_bw() +
+  guides(color=guide_legend("Variable")) + 
+  theme_bw()
 
 ### What if we have an interaction? 
 
@@ -112,6 +134,9 @@ model_1 <- polr(as.factor(y_1) ~ x + z + x*z, method = "logistic")
 # The Marginal Effect of X on Y conditional on Z! 
 marg_fx1 <- avg_slopes(model_1, variables = 'x', by = 'z')
 
+# Note: As with avg_predictions, we can use simply slopes() when we want a 
+# marginal effect for each individual observation
+
 marg_fx1 |>
   ggplot(mapping = aes(y = estimate, x = group, color = as.factor(z))) +
   geom_point() + 
@@ -126,6 +151,9 @@ marg_fx1 |>
 
 # The Marginal Effect of Z going from 0 to 1! 
 marg_fx2 <- avg_comparisons(model_1, variables = 'z')
+
+# Note: as previously, when we want individual level comparisons, we can use
+# comparisons() instead.
 
 marg_fx2 |>
   ggplot(mapping = aes(y = estimate, x = group)) +
