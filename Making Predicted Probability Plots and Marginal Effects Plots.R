@@ -168,3 +168,10 @@ marg_fx3 |>
   geom_point() + 
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high))
 
+# What if we're really desperate for a nice, simple line? 
+marg_fx3 |>
+  ggplot(mapping = aes(y = estimate, x = as.numeric(group))) +
+  geom_point() + 
+  geom_smooth(method = lm) +
+  ylim(-0.6,0.6) + 
+  theme_bw()
